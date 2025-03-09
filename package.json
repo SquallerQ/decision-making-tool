@@ -13,7 +13,7 @@
     "lint:fix": "eslint --ext .ts --fix .",
     "stylelint": "stylelint '**/*.{css,scss}'",
     "stylelint:fix": "stylelint '**/*.{css,scss}' --fix",
-    "prepare": "husky"
+    "prepare": "husky && husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -22,7 +22,7 @@
     "@typescript-eslint/parser": "^8.26.0",
     "eslint": "^9.22.0",
     "eslint-plugin-unicorn": "^57.0.0",
-    "husky": "^9.1.7",
+    "husky": "^8.0.0",
     "lint-staged": "^15.4.3",
     "prettier": "^3.5.3",
     "stylelint": "^16.15.0",
@@ -30,5 +30,13 @@
     "stylelint-config-standard": "^37.0.0",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --fix",
+    "*.js": "eslint --fix",
+    "*.css": "stylelint --fix",
+    "*.scss": "stylelint --fix",
+    "*.html": "prettier --write",
+    "*.json": "prettier --write"
   }
 }
