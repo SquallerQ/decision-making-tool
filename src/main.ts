@@ -1,4 +1,7 @@
 import { Router } from "./router";
 
 
-const router = new Router();
+const appContainer = document.createElement("div");
+document.body.appendChild(appContainer);
+
+new Router(appContainer);

@@ -2,7 +2,10 @@ import { List } from './pages/list';
 import { Picker } from './pages/picker';
 
 export class Router {
-  constructor () {
+  private root: HTMLElement;
+
+  constructor (root: HTMLElement) {
+    this.root = root;
     this.setupRoutes()
     this.navigateTo('list')
   }
@@ -18,21 +21,17 @@ export class Router {
 
   private renderPage() {
     const path = window.location.pathname;
-    this.clearBody();
+     this.clearRoot();
 
     if (path === '/list') {
-      const list = new List(this);
-      document.body.appendChild(list.render());
+      this.root.appendChild(new List(this).render());
     } else if (path === '/picker') {
-      const picker = new Picker(this);      
-      document.body.appendChild(picker.render());
+      this.root.appendChild(new Picker(this).render());
     }
   }
   
-  private clearBody() {
-    while (document.body.firstChild) {
-      document.body.removeChild(document.body.firstChild);
-    }
+  private clearRoot() {
+    this.root.replaceChildren();
   }
 }
 
