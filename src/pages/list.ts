@@ -1,4 +1,5 @@
 import { Router } from '../router';
+import { generateId, resetCounter } from '../utils/helpers';
 
 interface Option {
   id: string;
@@ -34,14 +35,12 @@ export class List {
     addButton.textContent = 'Add Option';
     addButton.className = 'btn';
     addButton.addEventListener('click', () => {
-      console.log('aaaaa');
+      const newOption = { id: generateId(this.options), title: "", weight: 0 }
+      this.options.push(newOption);
+      list.appendChild(this.createOptionElement(newOption));
     })
 
-    container.appendChild(title);
-    container.appendChild(button);
-    container.appendChild(list);
-    container.appendChild(addButton);
-
+    container.append(title, button, list, addButton)
     return container;
   }
 
@@ -68,11 +67,16 @@ export class List {
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Delete";
     deleteButton.className = "btn";
+    deleteButton.addEventListener("click", () => {
+      this.options = this.options.filter((opt) => opt.id !== option.id);
+      li.remove();
+      if (this.options.length === 0) {
+        resetCounter();
+      }
+    });
 
-    li.appendChild(idLabel)
-    li.appendChild(titleInput)
-    li.appendChild(weightInput)
-    li.appendChild(deleteButton)
+
+    li.append(idLabel, titleInput, weightInput, deleteButton)
     return li;
   }
 }
