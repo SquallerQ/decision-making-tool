@@ -1,5 +1,6 @@
 import { Router } from '../router';
-import { generateId, resetCounter, validateTitle, validateWeight } from '../utils/helpers';
+import { saveOptions, getOptions } from '../utils/storage';
+import { generateId, validateTitle, validateWeight } from '../utils/helpers';
 
 interface Option {
   id: string;
@@ -13,7 +14,7 @@ export class List {
 
   constructor(router: Router) {
     this.router = router;
-    this.options = [{ id: "#1", title: "", weight: 0 }];
+    this.options = getOptions() || [{ id: "#1", title: "", weight: null }];
   }
 
   public render(): HTMLElement {
@@ -35,8 +36,9 @@ export class List {
     addButton.textContent = 'Add Option';
     addButton.className = 'btn';
     addButton.addEventListener('click', () => {
-      const newOption = { id: generateId(this.options), title: "", weight: 0 }
+      const newOption = { id: generateId(this.options), title: "", weight: null }
       this.options.push(newOption);
+      saveOptions(this.options);
       list.appendChild(this.createOptionElement(newOption));
     })
 
@@ -60,26 +62,26 @@ export class List {
     titleInput.addEventListener("input", () => {
       titleInput.value = validateTitle(titleInput.value);
       option.title = titleInput.value;
+      saveOptions(this.options);
     });
 
     const weightInput = document.createElement("input");
     weightInput.className = "option-weight";
     weightInput.setAttribute("placeholder", "Weight");
     weightInput.setAttribute("type", "number");
+    weightInput.value = option.weight !== null ? option.weight.toString() : "";
     weightInput.addEventListener("input", () => {
       weightInput.value = validateWeight(weightInput.value);
       option.weight = parseInt(weightInput.value) || null;
+      saveOptions(this.options);
     });
-
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Delete";
     deleteButton.className = "option-btn";
     deleteButton.addEventListener("click", () => {
       this.options = this.options.filter((opt) => opt.id !== option.id);
       li.remove();
-      if (this.options.length === 0) {
-        resetCounter();
-      }
+      saveOptions(this.options);
     });
 
 

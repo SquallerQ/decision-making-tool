@@ -5,12 +5,7 @@ export function generateId(options: { id: string }[]): string {
     idCounter = 1;
     return `#${idCounter}`;
   }
-  const cleanID = options.map(option => {
-    return parseInt(option.id.replace("#", ""), 10);
-  });
-
-  const maxId = Math.max(...cleanID);
-  idCounter = maxId + 1;
+  idCounter = idCounter + 1;
   return `#${idCounter}`;
 }
 
