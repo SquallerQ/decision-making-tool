@@ -17,3 +17,11 @@ export function generateId(options: { id: string }[]): string {
 export function resetCounter() {
   idCounter = 1;
 }
+
+export function validateTitle(value: string): string {
+  return value.replace(/[^a-zA-Zа-яА-Я ]/g, "");
+}
+
+export function validateWeight(value: string): string {
+  return value.replace(/[^0-9]/g, ""); 
+}

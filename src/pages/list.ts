@@ -1,10 +1,10 @@
 import { Router } from '../router';
-import { generateId, resetCounter } from '../utils/helpers';
+import { generateId, resetCounter, validateTitle, validateWeight } from '../utils/helpers';
 
 interface Option {
   id: string;
   title: string,
-  weight: number;
+  weight: number | null;
 }
 
 export class List {
@@ -57,16 +57,23 @@ export class List {
     titleInput.className = "option-title";
     titleInput.setAttribute("placeholder", "Title");
     titleInput.value = option.title;
+    titleInput.addEventListener("input", () => {
+      titleInput.value = validateTitle(titleInput.value);
+      option.title = titleInput.value;
+    });
 
     const weightInput = document.createElement("input");
     weightInput.className = "option-weight";
     weightInput.setAttribute("placeholder", "Weight");
     weightInput.setAttribute("type", "number");
-    weightInput.value = option.weight.toString();
+    weightInput.addEventListener("input", () => {
+      weightInput.value = validateWeight(weightInput.value);
+      option.weight = parseInt(weightInput.value) || null;
+    });
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "Delete";
-    deleteButton.className = "btn";
+    deleteButton.className = "option-btn";
     deleteButton.addEventListener("click", () => {
       this.options = this.options.filter((opt) => opt.id !== option.id);
       li.remove();
