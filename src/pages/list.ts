@@ -44,7 +44,12 @@ export class List {
     pasteButton.className = 'btn';
     pasteButton.addEventListener('click', () => this.openPasteModal());
 
-    container.append(title, button, this.list, addButton, pasteButton)
+    const clearButton = document.createElement('button');
+    clearButton.textContent = 'Clear List';
+    clearButton.className = 'btn';
+    clearButton.addEventListener('click', () => this.clearList());
+
+    container.append(title, button, this.list, addButton, pasteButton, clearButton)
     return container;
   }
 
@@ -107,5 +112,10 @@ export class List {
     });
 
     document.body.appendChild(modal.render());
+  }
+  private clearList():void {
+    this.options = [];
+    this.list.replaceChildren();
+    saveOptions(this.options);
   }
 }
