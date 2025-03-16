@@ -1,8 +1,9 @@
 import { Router } from '../router';
 import { saveOptions, getOptions } from '../utils/storage';
-import { generateId, validateWeight } from '../utils/helpers';
+import { validateWeight } from '../utils/helpers';
 import { PasteListModal } from "../components/modal";
 import { Option } from '../types';
+import { IdGenerator } from '../utils/idGenerator';
 
 export class List {
   private router: Router;
@@ -33,7 +34,7 @@ export class List {
     addButton.textContent = 'Add Option';
     addButton.className = 'btn';
     addButton.addEventListener('click', () => {
-      const newOption = { id: generateId(this.options), title: "", weight: null }
+      const newOption = { id: IdGenerator.generateId(this.options), title: "", weight: null }
       this.options.push(newOption);
       saveOptions(this.options);
       this.list.appendChild(this.createOptionElement(newOption));
@@ -49,7 +50,17 @@ export class List {
     clearButton.className = 'btn';
     clearButton.addEventListener('click', () => this.clearList());
 
-    container.append(title, button, this.list, addButton, pasteButton, clearButton)
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save List to file';
+    saveButton.className = 'btn';
+    saveButton.addEventListener('click', () => this.saveList());
+
+    const loadButton = document.createElement('button');
+    loadButton.textContent = 'Load List from file';
+    loadButton.className = 'btn';
+    loadButton.addEventListener('click', () => this.loadList())
+
+    container.append(title, button, this.list, addButton, pasteButton, clearButton, saveButton, loadButton);
     return container;
   }
 
@@ -104,7 +115,7 @@ export class List {
     }
     const modal = new PasteListModal((newOptions) => {
       newOptions.forEach(option => {
-        option.id = generateId(this.options);
+        option.id = IdGenerator.generateId(this.options);
         this.options.push(option);
         this.list.appendChild(this.createOptionElement(option));
       });
@@ -117,5 +128,51 @@ export class List {
     this.options = [];
     this.list.replaceChildren();
     saveOptions(this.options);
+  }
+  private saveList(): void {
+    const dataToSave = {
+      options: this.options,
+      nextId: IdGenerator.generateId(this.options),
+    };
+    const jsonData = JSON.stringify(dataToSave, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'options.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  private loadList(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.addEventListener('change', (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target?.result as string;
+          try {
+            const parsedData: { options: Option[]; nextId: string } = JSON.parse(content);
+            this.options = parsedData.options;
+            saveOptions(this.options);
+            if (parsedData.nextId) {
+              const idNumber = parseInt(parsedData.nextId.replace('#', ''), 10);
+              if (!isNaN(idNumber)) {
+                IdGenerator.setIdCounter(idNumber - 1);
+              }
+            }
+            this.list.replaceChildren();
+            this.options.forEach((option) => this.list.appendChild(this.createOptionElement(option)));
+          } catch (error) {
+            console.error('Error parsing JSON file', error);
+          }
+        };
+
+        reader.readAsText(file);
+      }
+    });
+    input.click();
   }
 }
