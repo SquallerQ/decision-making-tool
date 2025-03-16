@@ -1,20 +1,19 @@
 import { Router } from '../router';
 import { saveOptions, getOptions } from '../utils/storage';
-import { generateId, validateTitle, validateWeight } from '../utils/helpers';
-
-interface Option {
-  id: string;
-  title: string,
-  weight: number | null;
-}
+import { generateId, validateWeight } from '../utils/helpers';
+import { PasteListModal } from "../components/modal";
+import { Option } from '../types';
 
 export class List {
   private router: Router;
   private options: Option[];
+  private list: HTMLUListElement;
 
   constructor(router: Router) {
     this.router = router;
     this.options = getOptions() || [{ id: "#1", title: "", weight: null }];
+    this.list = document.createElement("ul");
+    this.list.className = "options-list";
   }
 
   public render(): HTMLElement {
@@ -28,9 +27,7 @@ export class List {
     button.textContent = 'Go to Picker Page';
     button.addEventListener('click', () => this.router.navigateTo('picker'));
 
-    const list = document.createElement('ul');
-    list.className = 'options-list';
-    this.options.forEach((option) => list.appendChild(this.createOptionElement(option)));
+    this.options.forEach((option) => this.list.appendChild(this.createOptionElement(option)));
 
     const addButton = document.createElement('button');
     addButton.textContent = 'Add Option';
@@ -39,10 +36,15 @@ export class List {
       const newOption = { id: generateId(this.options), title: "", weight: null }
       this.options.push(newOption);
       saveOptions(this.options);
-      list.appendChild(this.createOptionElement(newOption));
+      this.list.appendChild(this.createOptionElement(newOption));
     })
 
-    container.append(title, button, list, addButton)
+    const pasteButton = document.createElement('button');
+    pasteButton.textContent = 'Paste List';
+    pasteButton.className = 'btn';
+    pasteButton.addEventListener('click', () => this.openPasteModal());
+
+    container.append(title, button, this.list, addButton, pasteButton)
     return container;
   }
 
@@ -54,13 +56,15 @@ export class List {
     idLabel.className = 'option-id';
     idLabel.textContent = option.id;
     idLabel.setAttribute('for', `option${option.id}`);
+    idLabel.addEventListener('click', () => {
+      titleInput.focus();
+    });
 
     const titleInput = document.createElement("input");
     titleInput.className = "option-title";
     titleInput.setAttribute("placeholder", "Title");
     titleInput.value = option.title;
     titleInput.addEventListener("input", () => {
-      titleInput.value = validateTitle(titleInput.value);
       option.title = titleInput.value;
       saveOptions(this.options);
     });
@@ -88,5 +92,20 @@ export class List {
     li.append(idLabel, titleInput, weightInput, deleteButton)
     return li;
   }
-}
 
+  private openPasteModal() {
+    if (PasteListModal.isModalOpen) {
+      return;
+    }
+    const modal = new PasteListModal((newOptions) => {
+      newOptions.forEach(option => {
+        option.id = generateId(this.options);
+        this.options.push(option);
+        this.list.appendChild(this.createOptionElement(option));
+      });
+      saveOptions(this.options);
+    });
+
+    document.body.appendChild(modal.render());
+  }
+}
