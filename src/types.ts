@@ -3,3 +3,7 @@ export interface Option {
   title: string;
   weight: number | null;
 }
+export interface RouterState {
+  options?: Option[];
+  selectedOption?: Option;
+}

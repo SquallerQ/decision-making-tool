@@ -1,8 +1,9 @@
 import { Router } from '../router';
 import { saveOptions, getOptions } from '../utils/storage';
 import { validateWeight } from '../utils/helpers';
-import { PasteListModal } from "../components/modal";
-import { Option } from '../types';
+import { PasteListModal } from "../components/modal/pasteListModal";
+import { ValidationModal } from "../components/modal/validationModal";
+import { Option, RouterState } from '../types';
 import { IdGenerator } from '../utils/idGenerator';
 
 export class List {
@@ -10,9 +11,9 @@ export class List {
   private options: Option[];
   private list: HTMLUListElement;
 
-  constructor(router: Router) {
+  constructor(router: Router, state: RouterState) {
     this.router = router;
-    this.options = getOptions() || [{ id: "#1", title: "", weight: null }];
+    this.options = state.options || getOptions() || [{ id: "#1", title: "", weight: null }];
     this.list = document.createElement("ul");
     this.list.className = "options-list";
   }
@@ -23,10 +24,6 @@ export class List {
 
     const title = document.createElement('h1');
     title.textContent = 'Decision Making Tool';
-
-    const button = document.createElement('button');
-    button.textContent = 'Go to Picker Page';
-    button.addEventListener('click', () => this.router.navigateTo('picker'));
 
     this.options.forEach((option) => this.list.appendChild(this.createOptionElement(option)));
 
@@ -60,7 +57,25 @@ export class List {
     loadButton.className = 'btn';
     loadButton.addEventListener('click', () => this.loadList())
 
-    container.append(title, button, this.list, addButton, pasteButton, clearButton, saveButton, loadButton);
+    const toPickerButton = document.createElement('button');
+    toPickerButton.textContent = 'Start';
+    toPickerButton.className = 'btn';
+    toPickerButton.addEventListener('click', () => {
+      if (ValidationModal.isModalOpen) {
+        return;
+      }
+      const validOptions = this.options.filter(option => option.title.trim() !== '' && (option.weight ?? 0) > 0);
+      if (validOptions.length < 2) {
+        const modal = new ValidationModal(() => {
+          document.body.removeChild(modal.render());
+        });
+        document.body.appendChild(modal.render());
+      } else {
+        this.router.navigateTo('picker', { options: validOptions });
+      }
+    }) 
+
+    container.append(title, this.list, addButton, pasteButton, clearButton, saveButton, loadButton, toPickerButton);
     return container;
   }
 

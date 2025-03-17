@@ -1,5 +1,5 @@
-import { Option } from '../types';
-import { parseCSV } from "../utils/helpers";
+import { Option } from '../../types';
+import { parseCSV } from "../../utils/helpers";
 
 export class PasteListModal {
   private onConfirm: (options: Option[]) => void;
