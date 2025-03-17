@@ -1,5 +1,6 @@
 import { Router } from '../router';
 import { Option, RouterState } from '../types';
+import finishSoundUrl from '../audio/finish-sound.mp3';
 
 export class Picker {
   private router: Router;
@@ -10,6 +11,8 @@ export class Picker {
   private angleOffsets: number[];
   private isSpinning: boolean;
   private currentRotation: number = 0;
+  private isSoundOn: boolean;
+  private finishSound: HTMLAudioElement;
 
 
   constructor(router: Router, state: RouterState) {
@@ -23,6 +26,9 @@ export class Picker {
     this.angleOffsets = this.calculateAngleOffsets();
     this.isSpinning = false;
     this.currentRotation = 0;
+
+    this.isSoundOn = localStorage.getItem('soundState') !== 'off';
+    this.finishSound = new Audio(finishSoundUrl);
   }
 
   public render(): HTMLElement {
@@ -32,17 +38,54 @@ export class Picker {
     const title = document.createElement('h1');
     title.textContent = 'Decision Making Tool';
 
+    const controlsContainer = document.createElement('div');
+    controlsContainer.className = "controls-container";
+
     const backButton = document.createElement('button');
-    backButton.textContent = 'Go to List Page';
+    backButton.className = "control-button";
+    backButton.textContent = "←";
     backButton.addEventListener('click', () => this.router.navigateTo('list'));
+
+    const durationContainer = document.createElement('div');
+    durationContainer.className = 'duration-container';
+
+    const durationIcon = document.createElement('span');
+    durationIcon.textContent = "⏲";
+    durationIcon.className = 'duration-button';
+
+    const durationInput = document.createElement('input');
+    durationInput.className = 'duration-input';
+    durationInput.type = "number";
+    durationInput.placeholder = "Duration (seconds)";
+    durationInput.value = "16";
+    durationInput.min = "5";
+    durationInput.max = "30";
+    durationIcon.addEventListener('click', () => durationInput.focus());
+    durationContainer.append(durationIcon, durationInput);
+
+    const spinButton = document.createElement('button');
+    spinButton.className = "control-button";
+    spinButton.textContent = '▶';
+    spinButton.addEventListener('click', () => {
+        const duration = parseInt(durationInput.value, 10);
+        if (duration >= 5) {
+          this.spinWheel(resultField, durationInput, duration * 1000, [backButton, spinButton, soundButton]);
+        } else {
+          return;
+        }
+    });
+    const soundButton = document.createElement('button');
+    soundButton.className = "control-button";
+    soundButton.textContent = "🔊";
+    soundButton.textContent = this.isSoundOn ? "🔊" : "🔇";
+    soundButton.addEventListener('click', () => {
+      this.toggleSound(soundButton);
+    });
+    controlsContainer.append(backButton, durationContainer, soundButton, spinButton);
 
     const resultField = document.createElement('div');
     resultField.className = "result-field";
     resultField.textContent = "Press start button";
-
-    const spinButton = document.createElement('button');
-    spinButton.textContent = 'Spin the Wheel';
-    spinButton.addEventListener('click', () => this.spinWheel(resultField));
 
     const canvasContainer = document.createElement("div");
     canvasContainer.className = "canvas-container";
@@ -53,8 +96,13 @@ export class Picker {
 
     this.drawWheel();
 
-    container.append(title, resultField, canvasContainer, backButton, spinButton);
+    container.append(title, controlsContainer, resultField, canvasContainer);
     return container;
+  }
+  private toggleSound(soundButton: HTMLButtonElement) {
+    this.isSoundOn = !this.isSoundOn;
+    soundButton.textContent = this.isSoundOn ? "🔊" : "🔇";
+    localStorage.setItem('soundState', this.isSoundOn ? 'on' : 'off');
   }
 
   private shuffleArray<T>(array: T[]): T[] {
@@ -172,11 +220,17 @@ export class Picker {
     ctx.lineWidth = 3;
     ctx.stroke();
   }
-  private spinWheel(resultField: HTMLDivElement) {
+  private spinWheel(resultField: HTMLDivElement, durationInput: HTMLInputElement, duration: number, buttons: HTMLButtonElement[] ) {
     if (this.isSpinning) return;
     this.isSpinning = true;
 
-    const spinDuration = 3000;
+    buttons.forEach(button => {
+      button.disabled = true;
+      button.style.opacity = "0.5";
+    });
+    durationInput.disabled = true;
+    durationInput.style.opacity = "0.5";
+
     const startTime = Date.now();
     const startRotation = this.currentRotation;
     const randomRotation = Math.random() * 10 + 5;
@@ -184,10 +238,11 @@ export class Picker {
     const animate = () => {
       const currentTime = Date.now();
       const elapsedTime = currentTime - startTime;
-      const progress = Math.min(elapsedTime / spinDuration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3); 
+      const progress = Math.min(elapsedTime / duration, 1);
 
-      this.currentRotation = startRotation + (randomRotation * Math.PI * 2 * easeOut);
+      const easedProgress = this.easeInOutCubic(progress);
+
+      this.currentRotation = startRotation + (randomRotation * Math.PI * 2 * easedProgress);
       this.drawWheel();
 
       this.updateResultField(resultField, this.currentRotation);
@@ -197,11 +252,24 @@ export class Picker {
       } else {
         this.isSpinning = false;
         this.updateResultField(resultField, this.currentRotation, true);
+        buttons.forEach(button => {
+          button.disabled = false;
+          button.style.opacity = "1";
+        });
+        durationInput.disabled = false;
+        durationInput.style.opacity = "1";
+        if (this.isSoundOn) {
+          this.finishSound.play();
+        }
       }
     };
 
     animate();
   }
+  private easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
   private updateResultField(resultField: HTMLDivElement, currentRotation: number, isFinal: boolean = false) {
     const totalRotation = (currentRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
     const pointerAngle = (3 * Math.PI / 2 - totalRotation + Math.PI * 2) % (Math.PI * 2);

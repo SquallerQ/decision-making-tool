@@ -43,11 +43,13 @@ body {
   margin: 0;
   padding: 0;
 
-  background-color: #f0f0f0;
+  background-color: #e6f5f0;
 }
 
 h1 {
-  font-size: 25px;
+  margin-bottom: 10px;
+  font-size: 35px;
+  text-align: center;
 }
 
 button {
@@ -63,14 +65,9 @@ button {
   margin-top: 10px;
 }
 
-.page {
-  background-color: aquamarine;
-}
-
 .list-container {
+  max-height: 100vh;
   padding: 40px;
-  border: 1px solid #999;
-  background-color: #e6f5f0;
 }
 
 .options-list {
@@ -138,6 +135,46 @@ button {
 
 .option-btn:hover {
   background-color: #a12e2e;
+}
+
+.controls-container {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-button {
+  cursor: pointer;
+
+  height: 45px;
+  padding: 10px;
+  border: 1px solid #327333;
+
+  font-size: 18px;
+}
+
+.control-button:disabled {
+  cursor: auto;
+  opacity: 0.5;
+}
+
+.duration-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 45px;
+  padding: 0 5px;
+  border: 1px solid #327333;
+}
+
+.duration-button {
+  padding: 0 5px;
+}
+
+.duration-input {
+  height: 30px;
 }
 
 .result-field {
