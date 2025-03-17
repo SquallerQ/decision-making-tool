@@ -59,7 +59,6 @@ button {
 .btn {
   display: flex;
   place-content: center center;
-
   width: 100%;
   margin-top: 10px;
 }
@@ -139,4 +138,13 @@ button {
 
 .option-btn:hover {
   background-color: #a12e2e;
+}
+
+.result-field {
+  margin: 10px 0;
+  padding: 10px;
+  border: 2px solid #ccc;
+
+  font-size: 18px;
+  text-align: center;
 }
