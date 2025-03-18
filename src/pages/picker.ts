@@ -1,6 +1,5 @@
 import { Router } from '../router';
 import { Option, RouterState } from '../types';
-import finishSoundUrl from 'finish-sound.mp3';
 
 export class Picker {
   private router: Router;
@@ -28,7 +27,7 @@ export class Picker {
     this.currentRotation = 0;
 
     this.isSoundOn = localStorage.getItem('soundState') !== 'off';
-    this.finishSound = new Audio(finishSoundUrl);
+    this.finishSound = new Audio('/finish-sound.mp3');
   }
 
   public render(): HTMLElement {
@@ -60,8 +59,22 @@ export class Picker {
     durationInput.value = "16";
     durationInput.min = "5";
     durationInput.max = "30";
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = 'Enter a value > 4';
+    tooltip.style.display = 'none';
+    durationInput.addEventListener('input', () => {
+    const value = parseInt(durationInput.value, 10);
+      if (value < 5) {
+        tooltip.style.display = 'block';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
+
     durationIcon.addEventListener('click', () => durationInput.focus());
-    durationContainer.append(durationIcon, durationInput);
+    durationContainer.append(durationIcon, durationInput, tooltip);
 
     const spinButton = document.createElement('button');
     spinButton.className = "control-button";

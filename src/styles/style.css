@@ -160,6 +160,8 @@ button {
 }
 
 .duration-container {
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,6 +169,22 @@ button {
   height: 45px;
   padding: 0 5px;
   border: 1px solid #327333;
+}
+
+.tooltip {
+  position: absolute;
+
+  display: none;
+
+  margin-top: -90px;
+  margin-left: 120px;
+  padding: 5px;
+  border-radius: 4px;
+
+  font-size: 12px;
+  color: #fff;
+
+  background-color: #f44;
 }
 
 .duration-button {
