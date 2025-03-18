@@ -66,9 +66,7 @@ export class List {
       }
       const validOptions = this.options.filter(option => option.title.trim() !== '' && (option.weight ?? 0) > 0);
       if (validOptions.length < 2) {
-        const modal = new ValidationModal(() => {
-          document.body.removeChild(modal.render());
-        });
+        const modal = new ValidationModal(() => {});
         document.body.appendChild(modal.render());
       } else {
         this.router.navigateTo('picker', { options: validOptions });

@@ -43,11 +43,12 @@ export class ValidationModal {
   public render(): HTMLElement {
     return this.modal;
   }
-
   private close() {
     document.removeEventListener("keydown", this.handleKeydown);
     document.body.style.overflow = "";
-    this.modal.remove();
+    if (this.modal.parentNode) {
+      this.modal.parentNode.removeChild(this.modal);
+    }
     ValidationModal.isModalOpen = false;
     this.onClose();
   }
