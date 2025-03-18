@@ -1,6 +1,6 @@
 import { Router } from '../router';
 import { Option, RouterState } from '../types';
-import finishSoundUrl from '../audio/finish-sound.mp3';
+import finishSoundUrl from 'finish-sound.mp3';
 
 export class Picker {
   private router: Router;

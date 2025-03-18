@@ -1,39 +1,33 @@
+import js from '@eslint/js';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
-import unicornPlugin from 'eslint-plugin-unicorn';
 import typescriptParser from '@typescript-eslint/parser';
+import unicornPlugin from 'eslint-plugin-unicorn';
 
 export default [
+  js.configs.recommended,
   {
     languageOptions: {
       parser: typescriptParser,
-      parserOptions: {
-        project: './tsconfig.json',
-      },
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
     plugins: {
       '@typescript-eslint': typescriptPlugin,
       unicorn: unicornPlugin,
     },
     rules: {
-      '@typescript-eslint/consistent-type-assertions': [
-        'error',
-        { assertionStyle: 'never' },
-      ],
-      '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/explicit-member-accessibility': [
         'error',
         { accessibility: 'explicit', overrides: { constructors: 'off' } },
       ],
       '@typescript-eslint/member-ordering': 'error',
-      'class-methods-use-this': 'error',
-      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-      'unicorn/no-array-callback-reference': 'off',
-      'unicorn/no-array-for-each': 'off',
-      'unicorn/no-array-reduce': 'off',
-      'unicorn/no-null': 'off',
-      'unicorn/number-literal-case': 'off',
-      'unicorn/numeric-separators-style': 'off',
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        { assertionStyle: 'never' },
+      ],
+      '@typescript-eslint/consistent-type-imports': 'error',
       'unicorn/prevent-abbreviations': [
         'error',
         {
@@ -47,6 +41,13 @@ export default [
           },
         },
       ],
+      'unicorn/no-null': 'off',
+      'unicorn/no-array-reduce': 'off',
+      'unicorn/no-array-callback-reference': 'off',
+      'unicorn/no-array-for-each': 'off',
+      'unicorn/number-literal-case': 'off',
+      'unicorn/numeric-separators-style': 'off',
+      'class-methods-use-this': 'error',
     },
     ignores: ['node_modules/', 'dist/'],
   },

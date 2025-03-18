@@ -1,14 +1,23 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "strict": true,
-    // "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
+    "noImplicitAny": true,
     "alwaysStrict": true,
     "strictBuiltinIteratorReturn": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
   }
 }
