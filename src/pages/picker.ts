@@ -184,8 +184,15 @@ export class Picker {
     const midAngle = (startAngle + endAngle) / 2;
     const textRadius = radius * 0.7;
 
-    if (text.length > 20) {
-      text = text.slice(0, 10) + "...";
+    const angleRange = endAngle - startAngle;
+    const minAngleForText = Math.PI / 8;
+
+    if (angleRange < minAngleForText) {
+      return;
+    }
+    const maxTextLength = 10;
+    if (text.length > maxTextLength) {
+      text = text.slice(0, maxTextLength) + "...";
     }
 
     ctx.save();
@@ -193,7 +200,7 @@ export class Picker {
     ctx.rotate(midAngle);
 
     ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
+    ctx.font = "16px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.strokeStyle = "black";
