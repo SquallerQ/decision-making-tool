@@ -1,5 +1,5 @@
-import { Router } from '../router';
-import { RouterState } from '../types';
+import type { Router } from '../router';
+import type { RouterState } from '../types';
 
 export class Error {
   private router: Router;

@@ -1,7 +1,11 @@
-import { Router } from '../router';
-import { Option, RouterState } from '../types';
+import type { Router } from '../router';
+import type { Option, RouterState } from '../types';
 
 export class Picker {
+  private static readonly CANVAS_SIZE = 410;
+  private static readonly MIN_DURATION = 5;
+  private static readonly MAX_TEXT_LENGTH = 10;
+
   private router: Router;
   private options: Option[];
   private canvas: HTMLCanvasElement;
@@ -13,21 +17,62 @@ export class Picker {
   private isSoundOn: boolean;
   private finishSound: HTMLAudioElement;
 
+  private readonly wheelStyles = {
+    strokeStyle: "#333",
+    lineWidth: 2,
+  };
+
+  private readonly centerElementStyles = {
+    fillStyle: "#98d399",
+    strokeStyle: "#fff",
+    lineWidth: 3,
+    radius: 30,
+  };
+
+  private readonly cursorStyles = {
+    fillStyle: "#000",
+    strokeStyle: "#000",
+    lineWidth: 2,
+    tipOffset: 25,
+    baseOffset: 10,
+    width: 15,
+  };
+
+  private readonly textStyles = {
+    fillStyle: "white",
+    font: "16px Arial",
+    textAlign: "center" as const,
+    textBaseline: "middle" as const,
+    strokeStyle: "black",
+    lineWidth: 2,
+  };
 
   constructor(router: Router, state: RouterState) {
     this.router = router;
-    this.options = this.shuffleArray(state.options || []);
+    this.options = Picker.shuffleArray(state.options || []);
 
     this.canvas = document.createElement("canvas");
     this.ctx = this.canvas.getContext("2d");
 
-    this.colors = this.options.map(() => this.getRandomColor());
+    this.colors = this.options.map(() => Picker.getRandomColor());
     this.angleOffsets = this.calculateAngleOffsets();
     this.isSpinning = false;
     this.currentRotation = 0;
 
     this.isSoundOn = localStorage.getItem('soundState') !== 'off';
     this.finishSound = new Audio('/finish-sound.mp3');
+  }
+
+  private static shuffleArray<T>(array: T[]): T[] {
+    return [...array].sort(() => Math.random() - 0.5);
+  }
+
+  private static getRandomColor(): string {
+    return `hsl(${Math.random() * 360}, 70%, 60%)`;
+  }
+
+  private static easeInOutCubic(t: number): number {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
   public render(): HTMLElement {
@@ -66,7 +111,7 @@ export class Picker {
     tooltip.style.display = 'none';
     durationInput.addEventListener('input', () => {
     const value = parseInt(durationInput.value, 10);
-      if (value < 5) {
+      if (value < Picker.MIN_DURATION) {
         tooltip.style.display = 'block';
       } else {
         tooltip.style.display = 'none';
@@ -81,7 +126,7 @@ export class Picker {
     spinButton.textContent = '▶';
     spinButton.addEventListener('click', () => {
         const duration = parseInt(durationInput.value, 10);
-        if (duration >= 5) {
+        if (duration >= Picker.MIN_DURATION) {
           this.spinWheel(resultField, durationInput, duration * 1000, [backButton, spinButton, soundButton]);
         } else {
           return;
@@ -103,8 +148,8 @@ export class Picker {
     const canvasContainer = document.createElement("div");
     canvasContainer.className = "canvas-container";
 
-    this.canvas.width = 410;
-    this.canvas.height = 410;
+    this.canvas.width = Picker.CANVAS_SIZE;
+    this.canvas.height = Picker.CANVAS_SIZE;
     canvasContainer.appendChild(this.canvas);
 
     this.drawWheel();
@@ -112,18 +157,10 @@ export class Picker {
     container.append(title, controlsContainer, resultField, canvasContainer);
     return container;
   }
-  private toggleSound(soundButton: HTMLButtonElement) {
+  private toggleSound(soundButton: HTMLButtonElement):void {
     this.isSoundOn = !this.isSoundOn;
     soundButton.textContent = this.isSoundOn ? "🔊" : "🔇";
     localStorage.setItem('soundState', this.isSoundOn ? 'on' : 'off');
-  }
-
-  private shuffleArray<T>(array: T[]): T[] {
-    return [...array].sort(() => Math.random() - 0.5);
-  }
-
-  private getRandomColor(): string {
-    return `hsl(${Math.random() * 360}, 70%, 60%)`;
   }
 
   private calculateAngleOffsets(): number[] {
@@ -138,49 +175,49 @@ export class Picker {
     });
   }
 
-  private drawWheel() {
+  private drawWheel():void {
     if (!this.ctx) return;
-    const ctx = this.ctx;
+    const context = this.ctx;
     const radius = (this.canvas.width - 10) / 2;
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
 
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(this.currentRotation);
-    ctx.translate(-centerX, -centerY);
+    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    context.save();
+    context.translate(centerX, centerY);
+    context.rotate(this.currentRotation);
+    context.translate(-centerX, -centerY);
 
     this.options.forEach((option, index) => {
       const startAngle = this.angleOffsets[index];
       const endAngle = this.angleOffsets[index + 1] || Math.PI * 2;
 
-      ctx.beginPath();
-      ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-      ctx.fillStyle = this.colors[index];
-      ctx.fill();
-      ctx.strokeStyle = "#333";
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      context.beginPath();
+      context.moveTo(centerX, centerY);
+      context.arc(centerX, centerY, radius, startAngle, endAngle);
+      context.fillStyle = this.colors[index];
+      context.fill();
+      context.strokeStyle = this.wheelStyles.strokeStyle;
+      context.lineWidth = this.wheelStyles.lineWidth;
+      context.stroke();
 
-      this.drawText(ctx, option.title, centerX, centerY, startAngle, endAngle, radius);
+      this.drawText(context, option.title, centerX, centerY, startAngle, endAngle, radius);
     });
 
-    ctx.restore();
+    context.restore();
     this.drawCursor();
-    this.drawCenterElement(ctx, centerX, centerY);
+    this.drawCenterElement(context, centerX, centerY);
   }
 
   private drawText(
-    ctx: CanvasRenderingContext2D,
+    context: CanvasRenderingContext2D,
     text: string,
     centerX: number,
     centerY: number,
     startAngle: number,
     endAngle: number,
     radius: number
-  ) {
+  ):void {
     const midAngle = (startAngle + endAngle) / 2;
     const textRadius = radius * 0.7;
 
@@ -190,57 +227,57 @@ export class Picker {
     if (angleRange < minAngleForText) {
       return;
     }
-    const maxTextLength = 10;
-    if (text.length > maxTextLength) {
-      text = text.slice(0, maxTextLength) + "...";
+
+    if (text.length > Picker.MAX_TEXT_LENGTH) {
+      text = text.slice(0, Picker.MAX_TEXT_LENGTH) + "...";
     }
 
-    ctx.save();
-    ctx.translate(centerX, centerY);
-    ctx.rotate(midAngle);
+    context.save();
+    context.translate(centerX, centerY);
+    context.rotate(midAngle);
 
-    ctx.fillStyle = "white";
-    ctx.font = "16px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
+    context.fillStyle = this.textStyles.fillStyle;
+    context.font = this.textStyles.font;
+    context.textAlign = this.textStyles.textAlign;
+    context.textBaseline = this.textStyles.textBaseline;
+    context.strokeStyle = this.textStyles.strokeStyle;
+    context.lineWidth = this.textStyles.lineWidth;
 
-    ctx.strokeText(text, textRadius, 0);
-    ctx.fillText(text, textRadius, 0);
+    context.strokeText(text, textRadius, 0);
+    context.fillText(text, textRadius, 0);
 
-    ctx.restore();
+    context.restore();
   }
 
-  private drawCursor() {
+  private drawCursor():void {
     if (!this.ctx) return;
-    const ctx = this.ctx;
-    const radius = (this.canvas.width - 10) / 2
+    const context = this.ctx;
+    const radius = (this.canvas.width - 10) / 2;
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
 
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY - radius + 25);
-    ctx.lineTo(centerX - 15, centerY - radius - 10);
-    ctx.lineTo(centerX + 15, centerY - radius - 10);
-    ctx.closePath();
-    ctx.fillStyle = "#000";
-    ctx.fill();
-    ctx.strokeStyle = "#000";
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    context.beginPath();
+    context.moveTo(centerX, centerY - radius + this.cursorStyles.tipOffset);
+    context.lineTo(centerX - this.cursorStyles.width, centerY - radius - this.cursorStyles.baseOffset);
+    context.lineTo(centerX + this.cursorStyles.width, centerY - radius - this.cursorStyles.baseOffset);
+    context.closePath();
+    context.fillStyle = this.cursorStyles.fillStyle;
+    context.fill();
+    context.strokeStyle = this.cursorStyles.strokeStyle;
+    context.lineWidth = this.cursorStyles.lineWidth;
+    context.stroke();
   }
 
-  private drawCenterElement(ctx: CanvasRenderingContext2D, centerX: number, centerY: number) {
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
-    ctx.fillStyle = "#98d399";
-    ctx.fill();
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 3;
-    ctx.stroke();
+  private drawCenterElement(context: CanvasRenderingContext2D, centerX: number, centerY: number):void {
+    context.beginPath();
+    context.arc(centerX, centerY, this.centerElementStyles.radius, 0, Math.PI * 2);
+    context.fillStyle = this.centerElementStyles.fillStyle;
+    context.fill();
+    context.strokeStyle = this.centerElementStyles.strokeStyle;
+    context.lineWidth = this.centerElementStyles.lineWidth;
+    context.stroke();
   }
-  private spinWheel(resultField: HTMLDivElement, durationInput: HTMLInputElement, duration: number, buttons: HTMLButtonElement[] ) {
+  private spinWheel(resultField: HTMLDivElement, durationInput: HTMLInputElement, duration: number, buttons: HTMLButtonElement[] ): void {
     if (this.isSpinning) return;
     this.isSpinning = true;
 
@@ -255,12 +292,12 @@ export class Picker {
     const startRotation = this.currentRotation;
     const randomRotation = Math.random() * 10 + 5;
 
-    const animate = () => {
+    const animate = (): void => {
       const currentTime = Date.now();
       const elapsedTime = currentTime - startTime;
       const progress = Math.min(elapsedTime / duration, 1);
 
-      const easedProgress = this.easeInOutCubic(progress);
+      const easedProgress = Picker.easeInOutCubic(progress);
 
       this.currentRotation = startRotation + (randomRotation * Math.PI * 2 * easedProgress);
       this.drawWheel();
@@ -286,11 +323,8 @@ export class Picker {
 
     animate();
   }
-  private easeInOutCubic(t: number): number {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  }
 
-  private updateResultField(resultField: HTMLDivElement, currentRotation: number, isFinal: boolean = false) {
+  private updateResultField(resultField: HTMLDivElement, currentRotation: number, isFinal: boolean = false): void {
     const totalRotation = (currentRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
     const pointerAngle = (3 * Math.PI / 2 - totalRotation + Math.PI * 2) % (Math.PI * 2);
 

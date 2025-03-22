@@ -1,13 +1,13 @@
-import { Option } from '../../types';
+import type { Option } from '../../types';
 import { parseCSV } from "../../utils/helpers";
 
 export class PasteListModal {
+  public static isModalOpen: boolean = false;
   private onConfirm: (options: Option[]) => void;
   private modal: HTMLDivElement;
   private textArea: HTMLTextAreaElement;
   private overlay: HTMLDivElement;
-  public static isModalOpen: boolean = false;
-
+  
   constructor(onConfirm: (options: Option[]) => void) {
     this.onConfirm = onConfirm;
     this.modal = document.createElement("div");
@@ -20,7 +20,11 @@ export class PasteListModal {
     setTimeout(() => this.textArea.focus(), 0);
   }
 
-  private createModalBody() {
+  public render(): HTMLElement {
+    return this.modal;
+  }
+  
+  private createModalBody():void {
     this.textArea.className = "modal-textarea";
     this.textArea.placeholder =  
       `Paste a list of new options in a CSV-like format:\n\n` +
@@ -47,22 +51,18 @@ export class PasteListModal {
 
     this.overlay.className = "modal-overlay";
     this.overlay.append(modalContent);
-    this.overlay.addEventListener("click", (e) => { if (e.target === this.overlay) this.close(); });
+    this.overlay.addEventListener("click", (event) => { if (event.target === this.overlay) this.close(); });
 
     this.modal.className = "modal";
     this.modal.append(this.overlay);
   }
 
-  private createModalEvents() {
+  private createModalEvents():void {
     document.addEventListener("keydown", this.handleKeydown);
     document.body.style.overflow = "hidden";
   }
 
-  public render(): HTMLElement {
-    return this.modal;
-  }
-
-  private handleConfirm() {
+  private handleConfirm():void {
     const newOptions = parseCSV(this.textArea.value);
     if (newOptions.length > 0) {
       this.onConfirm(newOptions);
@@ -70,14 +70,14 @@ export class PasteListModal {
     this.close();
   }
 
-  private close() {
+  private close():void {
     document.removeEventListener("keydown", this.handleKeydown);
     document.body.style.overflow = "";
     this.modal.remove();
     PasteListModal.isModalOpen = false;
   }
 
-  private handleKeydown = (event: KeyboardEvent) => {    
+  private handleKeydown = (event: KeyboardEvent):void => {    
     if (event.key === "Escape") {
       this.close();
     }

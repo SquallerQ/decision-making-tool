@@ -1,9 +1,8 @@
-import { Router } from '../router';
+import type { Router } from '../router';
 import { saveOptions, getOptions } from '../utils/storage';
 import { validateWeight } from '../utils/helpers';
-import { PasteListModal } from "../components/modal/pasteListModal";
-import { ValidationModal } from "../components/modal/validationModal";
-import { Option, RouterState } from '../types';
+import { PasteListModal, ValidationModal } from "../components/modal/";
+import type { Option, RouterState } from '../types';
 import { IdGenerator } from '../utils/idGenerator';
 
 export class List {
@@ -122,7 +121,7 @@ export class List {
     return li;
   }
 
-  private openPasteModal() {
+  private openPasteModal():void {
     if (PasteListModal.isModalOpen) {
       return;
     }
@@ -161,13 +160,17 @@ export class List {
     input.type = 'file';
     input.accept = '.json';
     input.addEventListener('change', (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!(event.target instanceof HTMLInputElement)) return;
+      const file = event.target.files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          const content = e.target?.result as string;
+        reader.onload = (event): void => {
+          const result = event.target?.result;
+          if (typeof result !== 'string') {
+            return;
+          }
           try {
-            const parsedData: { options: Option[]; nextId: string } = JSON.parse(content);
+            const parsedData: { options: Option[]; nextId: string } = JSON.parse(result);
             this.options = parsedData.options;
             saveOptions(this.options);
             if (parsedData.nextId) {
@@ -178,8 +181,8 @@ export class List {
             }
             this.list.replaceChildren();
             this.options.forEach((option) => this.list.appendChild(this.createOptionElement(option)));
-          } catch (error) {
-            console.error('Error parsing JSON file', error);
+          } catch {
+            return;
           }
         };
 

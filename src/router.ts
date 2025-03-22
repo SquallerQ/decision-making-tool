@@ -1,7 +1,7 @@
 import { List } from './pages/list';
 import { Picker } from './pages/picker';
 import { Error } from './pages/error';
-import { Option, RouterState } from './types';
+import type { RouterState } from './types';
 import { getOptions } from './utils/storage';
 
 export class Router {
@@ -14,11 +14,7 @@ export class Router {
     this.renderPage();
   }
 
-  private setupRoutes() {
-    window.addEventListener('hashchange', () => this.renderPage());
-  }
-
-  public navigateTo(page: string, data?: RouterState) {
+  public navigateTo(page: string, data?: RouterState): void {
     this.state = { ...this.state, ...(data || {}) };
 
     if (page === 'picker') {
@@ -34,25 +30,28 @@ export class Router {
     this.renderPage();
   }
 
-  private renderPage() {
-    this.clearRoot();
-    const route = window.location.hash.replace('#', '') || 'list';
-
-    if (route === 'list') {
-      this.root.appendChild(new List(this, this.state).render());
-    } else if (route === 'picker') {
-      const options = getOptions();
-      if (!options || options.length < 2) {
-        this.root.appendChild(new Error(this, this.state).render());
-      } else {
-        this.root.appendChild(new Picker(this, this.state).render());
-      }
-    } else {
-      this.root.appendChild(new Error(this, this.state).render());
-    }
+  private setupRoutes(): void {
+    window.addEventListener('hashchange', () => this.renderPage());
   }
 
-  private clearRoot() {
+  private renderPage():void {
+    this.clearRoot();
+    const route = window.location.hash.replace('#', '') || 'list';
+    const options = getOptions();
+
+    let page;
+    if (route === 'list') {
+      page = new List(this, this.state);
+    } else if (route === 'picker' && options && options.length >= 2) {
+      page = new Picker(this, this.state);
+    } else {
+      page = new Error(this, this.state);
+    }
+
+    this.root.appendChild(page.render());
+  }
+
+  private clearRoot():void {
     this.root.replaceChildren();
   }
 }

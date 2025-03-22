@@ -1,3 +1,4 @@
+import globals from 'globals';
 import js from '@eslint/js';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
@@ -6,10 +7,14 @@ import unicornPlugin from 'eslint-plugin-unicorn';
 export default [
   js.configs.recommended,
   {
+    files: ['**/*.ts'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
+      globals: {
+        ...globals.browser,
+      },
     },
     plugins: {
       '@typescript-eslint': typescriptPlugin,
@@ -17,6 +22,7 @@ export default [
     },
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'error',
+      'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/explicit-member-accessibility': [
         'error',
