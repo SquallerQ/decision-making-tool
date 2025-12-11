@@ -46,7 +46,7 @@ body {
   padding: 0;
 
   background-color: #e6f5f0;
-  background-image: url("/bg.webp");
+  background-image: url("/bg.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -85,27 +85,30 @@ button {
 
   width: 100%;
   margin-top: 10px;
-  border: none;
+  border: 1px solid #000;
 
-  background-color: #fff;
+  color: #f0f6ff;
+
+  background-color: rgb(30 50 80 / 40%);
 
   transition: all 0.3s ease;
 }
 
 .btn:hover {
-  border: none;
-  color: #fff;
-  background-color: #000;
+  background-color: rgb(230 240 255 / 22%);
 }
 
 .list-container {
   width: 100%;
   max-width: 720px;
   padding: 40px 45px;
-  border: 1px solid rgb(0 0 0 / 15%);
+  border: 1px solid rgb(100 140 180 / 40%);
 
-  background-color: rgb(255 255 255 / 88%);
-  box-shadow: 0 15px 40px rgb(0 0 0 / 25%);
+  color: #fff;
+
+  background: rgb(20 40 70 / 55%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 45px rgb(0 0 0 / 55%);
 }
 
 .options-list {
@@ -121,17 +124,18 @@ button {
   justify-content: center;
 
   padding: 10px;
-  border: 1px solid #c3c3c3;
+  border: 1px solid #000;
 }
 
 .option-id {
   cursor: pointer;
+
   padding: 5px;
+  border: 1px solid #000;
 
-  /* border: 1px solid #999; */
+  color: #eef5ff;
 
-  color: #fff;
-  background-color: #000;
+  background-color: rgb(180 210 255 / 25%);
 }
 
 .option-weight {
@@ -156,22 +160,22 @@ button {
 
 .option-title:focus,
 .option-weight:focus {
-  border-color: #327333;
+  border-color: #5862fb;
 }
 
 .option-btn {
   padding: 7px 20px;
-  border: 1px solid #999;
+  border: 1px solid #4a7080;
 
-  color: #fff;
+  color: #f0f6ff;
 
-  background-color: #ffa2a2;
+  background-color: rgb(139 196 201 / 45%);
 
   transition: 0.4s ease;
 }
 
 .option-btn:hover {
-  background-color: #a12e2e;
+  background-color: rgb(139 196 201 / 75%);
 }
 
 .picker-container {
