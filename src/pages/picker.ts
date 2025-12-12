@@ -162,7 +162,7 @@ export class Picker {
 
     const soundButton = document.createElement('button');
     soundButton.className = 'control-button';
-    soundButton.textContent = this.isSoundOn ? '🔊' : '🔇';
+    soundButton.textContent = this.isSoundOn ? '🎧' : '✖️';
     soundButton.addEventListener('click', () => {
       this.toggleSound(soundButton);
     });
@@ -192,7 +192,7 @@ export class Picker {
 
   private toggleSound(soundButton: HTMLButtonElement): void {
     this.isSoundOn = !this.isSoundOn;
-    soundButton.textContent = this.isSoundOn ? '🔊' : '🔇';
+    soundButton.textContent = this.isSoundOn ? '🎧' : '✖️';
     localStorage.setItem(
       STORAGE_KEYS.SOUND_STATE,
       this.isSoundOn ? 'on' : 'off',

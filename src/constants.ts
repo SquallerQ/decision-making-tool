@@ -7,12 +7,12 @@ export const CANVAS_CONFIG = {
 } as const;
 
 export const WHEEL_STYLES = {
-  strokeStyle: '#333',
+  strokeStyle: 'rgba(150, 190, 230, 0.5)',
   lineWidth: 2,
 } as const;
 
 export const CENTER_ELEMENT_STYLES = {
-  fillStyle: '#98d399',
+  fillStyle: '#1b314d',
   strokeStyle: '#fff',
   lineWidth: 3,
   radius: 30,
@@ -20,7 +20,7 @@ export const CENTER_ELEMENT_STYLES = {
 
 export const CURSOR_STYLES = {
   fillStyle: '#000',
-  strokeStyle: '#000',
+  strokeStyle: 'rgba(150, 190, 230, 0.7)',
   lineWidth: 2,
   tipOffset: 25,
   baseOffset: 10,
@@ -28,7 +28,7 @@ export const CURSOR_STYLES = {
 } as const;
 
 export const TEXT_STYLES = {
-  fillStyle: 'white',
+  fillStyle: '#eaf2ff',
   font: '16px Arial',
   textAlign: 'center' as const,
   textBaseline: 'middle' as const,

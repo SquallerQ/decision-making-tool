@@ -180,9 +180,13 @@ button {
 
 .picker-container {
   padding: 40px 45px;
-  border: 1px solid rgb(0 0 0 / 15%);
-  background-color: rgb(255 255 255 / 88%);
-  box-shadow: 0 15px 40px rgb(0 0 0 / 25%);
+  border: 1px solid rgb(160 200 240 / 35%);
+
+  color: #f3f8ff;
+
+  background: rgb(25 45 75 / 55%);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 15px 50px rgb(0 0 0 / 55%);
 }
 
 .controls-container {
@@ -195,11 +199,21 @@ button {
 .control-button {
   cursor: pointer;
 
+  width: 45px;
   height: 45px;
-  padding: 10px;
-  border: 1px solid #327333;
-
+  padding: 10px;  
+  border: 1px solid rgb(70 100 150 / 50%);
+  
   font-size: 18px;
+  color: #eaf2ff;
+
+  background-color: rgb(10 20 35 / 60%);
+
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.control-button:hover {
+  background-color: rgb(30 50 80 / 65%);
 }
 
 .control-button:disabled {
@@ -216,7 +230,11 @@ button {
 
   height: 45px;
   padding: 0 5px;
-  border: 1px solid #327333;
+  border: 1px solid rgb(70 100 150 / 50%);
+
+  color: #eaf2ff;
+
+  background-color: rgb(10 20 35 / 60%);
 }
 
 .tooltip {
@@ -227,12 +245,14 @@ button {
   margin-top: -90px;
   margin-left: 120px;
   padding: 5px;
+  border: 1px solid rgb(70 100 150 / 50%);
   border-radius: 4px;
 
   font-size: 12px;
-  color: #fff;
+  color: #eaf2ff;
+  white-space: nowrap;
 
-  background-color: #f44;
+  background: rgb(10 20 35 / 85%);
 }
 
 .duration-button {
@@ -244,10 +264,14 @@ button {
 }
 
 .result-field {
-  margin: 10px 0;
-  padding: 10px;
-  border: 2px solid #ccc;
-
-  font-size: 18px;
+  margin: 20px 0;
+  padding: 12px 15px;
+  border: 1px solid rgb(150 190 230 / 35%);
+  
+  font-size: 20px;
+  color: #f0f6ff;
   text-align: center;
+
+  background: rgb(25 45 75 / 45%);
+  backdrop-filter: blur(6px);
 }
