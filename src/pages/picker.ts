@@ -348,8 +348,8 @@ export class Picker {
     if (selectedIndex !== -1) {
       resultField.textContent = this.options[selectedIndex].title;
       resultField.style.border = isFinal
-        ? '2px solid #327333'
-        : '2px solid #ccc';
+        ? '2px solid #fff'
+        : '2px solid #000';
     }
   }
 }
